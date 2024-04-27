@@ -1,0 +1,48 @@
+@startuml
+package "Entry" {
+  class Entry {
+    +validateAddress(coin: TWCoinType, address: string, addressPrefix: PrefixVariant): bool
+    +deriveAddress(coin: TWCoinType, publicKey: PublicKey, derivation: TWDerivation, addressPrefix: PrefixVariant): string
+    +addressToData(coin: TWCoinType, address: string): Data
+    +sign(coin: TWCoinType, dataIn: Data, dataOut: Data)
+    +plan(coin: TWCoinType, dataIn: Data, dataOut: Data)
+    +preImageHashes(coin: TWCoinType, txInputData: Data): Data
+    +compile(coin: TWCoinType, txInputData: Data, signatures: vector<Data>, publicKeys: vector<PublicKey>, dataOut: Data)
+  }
+}
+
+package "Signer" {
+  class Signer {
+    +{static} preImageHashes(input: Bitcoin::Proto::SigningInput): Bitcoin::Proto::PreSigningOutput
+    +{static} sign(input: Bitcoin::Proto::SigningInput, externalSignatures: HashPubkeyList): Bitcoin::Proto::SigningOutput
+  }
+}
+
+Entry -> Signer: sign, plan, preImageHashes, compile
+@enduml
+
+
+@startuml
+class Transaction {
+    +getPreImage(scriptCode: Bitcoin::Script, index: size_t, hashType: TWBitcoinSigHashType, amount: uint64_t): Data
+    +getPrevoutHash(): Data
+    +getSequenceHash(): Data
+    +getOutputsHash(): Data
+    +getJoinSplitsHash(): Data
+    +getShieldedSpendsHash(): Data
+    +getShieldedOutputsHash(): Data
+    +encode(data: Data)
+    +getSignatureHash(scriptCode: Bitcoin::Script, index: size_t, hashType: TWBitcoinSigHashType, amount: uint64_t, version: Bitcoin::SignatureVersion): Data
+    +proto(): Bitcoin::Proto::Transaction
+}
+
+Transaction -> Transaction: getSignatureHash
+Transaction -> Transaction: getPreImage
+Transaction -> Transaction: getPrevoutHash
+Transaction -> Transaction: getSequenceHash
+Transaction -> Transaction: getOutputsHash
+Transaction -> Transaction: getJoinSplitsHash
+Transaction -> Transaction: getShieldedSpendsHash
+Transaction -> Transaction: getShieldedOutputsHash
+@enduml
+
