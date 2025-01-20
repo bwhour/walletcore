@@ -64,9 +64,15 @@ Address::Address(const std::string& string) {
 
     // When creating an Address by string - we assume to only sent to 0.0.1 format, alias is internal.
     auto parts = TW::ssplit(string, '.');
-    mShard = *toInt(parts[0]);
-    mRealm = *toInt(parts[1]);
-    mNum = *toInt(parts[2]);
+    auto shardOpt = toInt(parts[0]);
+    auto realmOpt = toInt(parts[1]);
+    auto numOpt = toInt(parts[2]);
+    if (!shardOpt || !realmOpt || !numOpt) {
+        throw std::invalid_argument("Invalid address components");
+    }
+    mShard = *shardOpt;
+    mRealm = *realmOpt;
+    mNum = *numOpt;
 }
 
 Address::Address(const PublicKey& publicKey)
